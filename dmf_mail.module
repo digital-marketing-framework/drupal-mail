@@ -39,6 +39,17 @@ function dmf_mail_mail($key, &$message, $params) {
     $message['headers']['Reply-to'] = $replyToAddress;
   }
 
+  // Return-Path (bounce address) - use explicit value or fall back to From.
+  // Return-Path only supports a single email address (no name).
+  $returnPath = $email->getReturnPath();
+  if ($returnPath !== null) {
+    $message['headers']['Return-Path'] = $returnPath->getAddress();
+    $message['headers']['Sender'] = $returnPath->getAddress();
+  } elseif (!empty($from)) {
+    $message['headers']['Return-Path'] = $from[0]->getAddress();
+    $message['headers']['Sender'] = $from[0]->getAddress();
+  }
+
   // Get body content.
   $htmlBody = $email->getHtmlBody();
   $textBody = $email->getTextBody();
