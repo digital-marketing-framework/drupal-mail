@@ -19,42 +19,57 @@ function dmf_mail_mail($key, &$message, $params) {
   /** @var Email $email */
   $email = $params['email'];
 
-  // Subject
+  // Subject.
   $message['subject'] = $email->getSubject() ?? '';
 
-  // From address
+  // From address - set both message property and header.
+  // Using toString() to get "Name <email>" format.
+  // @see \Drupal\Core\Mail\MailManager::mail()
   $from = $email->getFrom();
   if (!empty($from)) {
-    $message['from'] = $from[0]->getAddress();
+    $fromAddress = $from[0]->toString();
+    $message['from'] = $fromAddress;
+    $message['headers']['From'] = $fromAddress;
   }
 
-  // Get body content
+  // Reply-To address - override the header set by MailManager to include name.
+  // Use 'Reply-to' (lowercase 't') to match Drupal's header key.
+  $replyTo = $email->getReplyTo();
+  if (!empty($replyTo)) {
+    $replyToAddress = $replyTo[0]->toString();
+    $message['reply-to'] = $replyToAddress;
+    $message['headers']['Reply-to'] = $replyToAddress;
+  }
+
+  // Get body content.
   $htmlBody = $email->getHtmlBody();
   $textBody = $email->getTextBody();
 
-  // Provide plain text for Mime Mail compatibility
-  // Mime Mail looks for $params['plaintext'] to create multipart/alternative
+  // Provide plain text for Mime Mail compatibility.
+  // Mime Mail looks for $params['plaintext'] to create multipart/alternative.
   if ($textBody !== null && $textBody !== '') {
     $message['params']['plaintext'] = $textBody;
   }
 
-  // Set the primary body
+  // Set the primary body.
+  // For HTML emails, set the html flag and Content-Type header.
   if ($htmlBody !== null && $htmlBody !== '') {
-    $message['headers']['Content-Type'] = 'text/html; charset=UTF-8';
+    $message['params']['html'] = TRUE;
+    $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed';
     $message['body'][] = $htmlBody;
   } elseif ($textBody !== null && $textBody !== '') {
     $message['body'][] = $textBody;
   }
 
-  // CC recipients
+  // CC recipients - use toString() for "Name <email>" format.
   $cc = $email->getCc();
   if (!empty($cc)) {
-    $message['headers']['Cc'] = implode(', ', array_map(fn($addr) => $addr->getAddress(), $cc));
+    $message['headers']['Cc'] = implode(', ', array_map(fn($addr) => $addr->toString(), $cc));
   }
 
-  // BCC recipients
+  // BCC recipients - use toString() for "Name <email>" format.
   $bcc = $email->getBcc();
   if (!empty($bcc)) {
-    $message['headers']['Bcc'] = implode(', ', array_map(fn($addr) => $addr->getAddress(), $bcc));
+    $message['headers']['Bcc'] = implode(', ', array_map(fn($addr) => $addr->toString(), $bcc));
   }
 }
