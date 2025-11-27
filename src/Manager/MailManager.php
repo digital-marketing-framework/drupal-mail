@@ -36,10 +36,11 @@ class MailManager implements MailManagerInterface
             'email' => $message,
         ];
 
+        // Pass reply-to for Drupal API compatibility.
         $reply = null;
         $replyTo = $message->getReplyTo();
         if (!empty($replyTo)) {
-            $reply = $replyTo[0]->getAddress();
+            $reply = $replyTo[0]->toString();
         }
 
         $this->mailManager->mail(self::MODULE, self::KEY, $to, $langcode, $params, $reply);

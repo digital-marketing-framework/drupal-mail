@@ -1,0 +1,118 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Anyrel Mail module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function dmf_mail_install() {
+  _dmf_mail_check_mail_plugin();
+}
+
+/**
+ * Implements hook_modules_installed().
+ */
+function dmf_mail_modules_installed($modules) {
+  // Re-check mail plugin when contrib mail modules are installed.
+  $mail_modules = ['mailsystem', 'smtp', 'symfony_mailer', 'swiftmailer'];
+  if (array_intersect($modules, $mail_modules)) {
+    _dmf_mail_check_mail_plugin();
+  }
+}
+
+/**
+ * Implements hook_modules_uninstalled().
+ */
+function dmf_mail_modules_uninstalled($modules) {
+  // Re-check mail plugin when contrib mail modules are uninstalled.
+  $mail_modules = ['mailsystem', 'smtp', 'symfony_mailer', 'swiftmailer'];
+  if (array_intersect($modules, $mail_modules)) {
+    _dmf_mail_check_mail_plugin();
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function dmf_mail_uninstall() {
+  // Remove our mail plugin override.
+  $config = \Drupal::configFactory()->getEditable('system.mail');
+  $mail_plugins = $config->get('interface');
+  if (isset($mail_plugins['dmf_mail'])) {
+    unset($mail_plugins['dmf_mail']);
+    $config->set('interface', $mail_plugins)->save();
+  }
+}
+
+/**
+ * Check and configure the appropriate mail plugin.
+ *
+ * If no contrib mail module is installed and the default mail interface is
+ * php_mail, register our custom dmf_php_mail plugin to support HTML emails.
+ * If a contrib mail module is handling emails, defer to it.
+ */
+function _dmf_mail_check_mail_plugin() {
+  $config_factory = \Drupal::configFactory();
+  $module_handler = \Drupal::moduleHandler();
+
+  $config = $config_factory->getEditable('system.mail');
+  $default_interface = $config->get('interface.default');
+
+  // Don't override if using test_mail_collector.
+  if ($default_interface === 'test_mail_collector') {
+    _dmf_mail_uninstall_plugin();
+    return;
+  }
+
+  // Check if a contrib mail module is installed and active.
+  $contrib_mail_modules = [
+    'mailsystem' => TRUE,
+    'smtp' => $config_factory->get('smtp.settings')->get('smtp_on'),
+    'symfony_mailer' => TRUE,
+    'swiftmailer' => TRUE,
+  ];
+
+  foreach ($contrib_mail_modules as $module => $is_active) {
+    if ($module_handler->moduleExists($module) && $is_active) {
+      // A contrib module is handling mail, defer to it.
+      _dmf_mail_uninstall_plugin();
+      return;
+    }
+  }
+
+  // If default is php_mail, install our HTML-supporting plugin.
+  if ($default_interface === 'php_mail') {
+    _dmf_mail_install_plugin();
+  }
+  else {
+    // Unknown mail plugin, don't override.
+    _dmf_mail_uninstall_plugin();
+  }
+}
+
+/**
+ * Install the dmf_php_mail plugin for the dmf_mail module.
+ */
+function _dmf_mail_install_plugin() {
+  $config = \Drupal::configFactory()->getEditable('system.mail');
+  $mail_plugins = $config->get('interface');
+  if (!isset($mail_plugins['dmf_mail']) || $mail_plugins['dmf_mail'] !== 'dmf_php_mail') {
+    $mail_plugins['dmf_mail'] = 'dmf_php_mail';
+    $config->set('interface', $mail_plugins)->save();
+  }
+}
+
+/**
+ * Uninstall the dmf_php_mail plugin override.
+ */
+function _dmf_mail_uninstall_plugin() {
+  $config = \Drupal::configFactory()->getEditable('system.mail');
+  $mail_plugins = $config->get('interface');
+  if (isset($mail_plugins['dmf_mail'])) {
+    unset($mail_plugins['dmf_mail']);
+    $config->set('interface', $mail_plugins)->save();
+  }
+}
