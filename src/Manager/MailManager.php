@@ -37,7 +37,6 @@ class MailManager implements MailManagerInterface
         ];
 
         // Pass reply-to for Drupal API compatibility.
-        // The full "Name <email>" format is set in hook_mail().
         $reply = null;
         $replyTo = $message->getReplyTo();
         if (!empty($replyTo)) {

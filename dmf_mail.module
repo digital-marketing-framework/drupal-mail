@@ -19,11 +19,10 @@ function dmf_mail_mail($key, &$message, $params) {
   /** @var Email $email */
   $email = $params['email'];
 
-  // Subject.
+  // Subject
   $message['subject'] = $email->getSubject() ?? '';
 
   // From address - set both message property and header.
-  // Using toString() to get "Name <email>" format.
   // @see \Drupal\Core\Mail\MailManager::mail()
   $from = $email->getFrom();
   if (!empty($from)) {
@@ -32,8 +31,7 @@ function dmf_mail_mail($key, &$message, $params) {
     $message['headers']['From'] = $fromAddress;
   }
 
-  // Reply-To address - override the header set by MailManager to include name.
-  // Use 'Reply-to' (lowercase 't') to match Drupal's header key.
+  // Reply-to address - override the header set by MailManager to include name.
   $replyTo = $email->getReplyTo();
   if (!empty($replyTo)) {
     $replyToAddress = $replyTo[0]->toString();
@@ -61,13 +59,13 @@ function dmf_mail_mail($key, &$message, $params) {
     $message['body'][] = $textBody;
   }
 
-  // CC recipients - use toString() for "Name <email>" format.
+  // CC recipients
   $cc = $email->getCc();
   if (!empty($cc)) {
     $message['headers']['Cc'] = implode(', ', array_map(fn($addr) => $addr->toString(), $cc));
   }
 
-  // BCC recipients - use toString() for "Name <email>" format.
+  // BCC recipients
   $bcc = $email->getBcc();
   if (!empty($bcc)) {
     $message['headers']['Bcc'] = implode(', ', array_map(fn($addr) => $addr->toString(), $bcc));
