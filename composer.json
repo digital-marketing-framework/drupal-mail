@@ -1,0 +1,45 @@
+{
+    "name": "digital-marketing-framework/drupal-mail",
+    "description": "Anyrel - Mail Manager - Drupal Integration",
+    "license": "GPL-2.0-or-later",
+    "type": "drupal-module",
+    "keywords": [
+        "drupal",
+        "module",
+        "marketing",
+        "framework",
+        "email",
+        "mail"
+    ],
+    "authors": [
+        {
+            "name": "Mediatis AG",
+            "email": "info@mediatis.de",
+            "homepage": "https://www.mediatis.de",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://www.mediatis.de",
+    "require": {
+        "php": "^8.1",
+        "composer/installers": "^1.0 || ^2.0",
+        "digital-marketing-framework/drupal-core": "^1.0",
+        "digital-marketing-framework/mail": "^2.0",
+        "drupal/core": "^10.0 || ^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Drupal\\dmf_mail\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "ergebnis/composer-normalize": true
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "installer-name": "dmf_mail"
+    }
+}

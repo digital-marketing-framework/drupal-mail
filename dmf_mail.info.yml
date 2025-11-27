@@ -1,0 +1,7 @@
+name: 'Anyrel - Mail'
+type: module
+description: 'Anyrel mail manager integration for Drupal'
+package: 'Anyrel'
+core_version_requirement: ^10 || ^11
+dependencies:
+  - dmf_core:dmf_core

@@ -1,0 +1,11 @@
+services:
+  dmf_mail.mail_manager:
+    class: Drupal\dmf_mail\Manager\MailManager
+    arguments:
+      - '@plugin.manager.mail'
+      - '@language_manager'
+
+  dmf_mail.core_registry_update_event_subscriber:
+    class: Drupal\dmf_mail\Registry\EventSubscriber\CoreRegistryUpdateEventSubscriber
+    tags:
+      - { name: event_subscriber }

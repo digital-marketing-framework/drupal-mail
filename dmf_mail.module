@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * @file
+ * Anyrel Mail module.
+ */
+
+use Drupal\dmf_mail\Manager\MailManager;
+use Symfony\Component\Mime\Email;
+
+/**
+ * Implements hook_mail().
+ */
+function dmf_mail_mail($key, &$message, $params) {
+  if ($key !== MailManager::KEY || !isset($params['email'])) {
+    return;
+  }
+
+  /** @var Email $email */
+  $email = $params['email'];
+
+  // Subject
+  $message['subject'] = $email->getSubject() ?? '';
+
+  // From address
+  $from = $email->getFrom();
+  if (!empty($from)) {
+    $message['from'] = $from[0]->getAddress();
+  }
+
+  // Get body content
+  $htmlBody = $email->getHtmlBody();
+  $textBody = $email->getTextBody();
+
+  // Provide plain text for Mime Mail compatibility
+  // Mime Mail looks for $params['plaintext'] to create multipart/alternative
+  if ($textBody !== null && $textBody !== '') {
+    $message['params']['plaintext'] = $textBody;
+  }
+
+  // Set the primary body
+  if ($htmlBody !== null && $htmlBody !== '') {
+    $message['headers']['Content-Type'] = 'text/html; charset=UTF-8';
+    $message['body'][] = $htmlBody;
+  } elseif ($textBody !== null && $textBody !== '') {
+    $message['body'][] = $textBody;
+  }
+
+  // CC recipients
+  $cc = $email->getCc();
+  if (!empty($cc)) {
+    $message['headers']['Cc'] = implode(', ', array_map(fn($addr) => $addr->getAddress(), $cc));
+  }
+
+  // BCC recipients
+  $bcc = $email->getBcc();
+  if (!empty($bcc)) {
+    $message['headers']['Bcc'] = implode(', ', array_map(fn($addr) => $addr->getAddress(), $bcc));
+  }
+}
