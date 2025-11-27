@@ -27,7 +27,7 @@ class MailManager implements MailManagerInterface
     public function sendMessage(Email $message): void
     {
         $toAddresses = $message->getTo();
-        $to = implode(', ', array_map(fn($addr) => $addr->getAddress(), $toAddresses));
+        $to = implode(', ', array_map(fn($addr) => $addr->toString(), $toAddresses));
 
         // Use default language as fallback for CLI context where current language may not be set
         $langcode = $this->languageManager->getDefaultLanguage()->getId();
