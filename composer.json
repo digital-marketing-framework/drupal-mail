@@ -22,7 +22,6 @@
     "homepage": "https://www.mediatis.de",
     "require": {
         "php": "^8.1",
-        "composer/installers": "^1.0 || ^2.0",
         "digital-marketing-framework/drupal-core": "^1.0",
         "digital-marketing-framework/mail": "^2.0",
         "drupal/core": "^10.0 || ^11.0"
