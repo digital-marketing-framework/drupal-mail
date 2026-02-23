@@ -39,7 +39,7 @@ function dmf_mail_modules_uninstalled($modules) {
  */
 function dmf_mail_uninstall() {
   // Remove our mail plugin override.
-  $config = \Drupal::configFactory()->getEditable('system.mail');
+  $config = Drupal::configFactory()->getEditable('system.mail');
   $mail_plugins = $config->get('interface');
   if (isset($mail_plugins['dmf_mail'])) {
     unset($mail_plugins['dmf_mail']);
@@ -55,8 +55,8 @@ function dmf_mail_uninstall() {
  * If a contrib mail module is handling emails, defer to it.
  */
 function _dmf_mail_check_mail_plugin() {
-  $config_factory = \Drupal::configFactory();
-  $module_handler = \Drupal::moduleHandler();
+  $config_factory = Drupal::configFactory();
+  $module_handler = Drupal::moduleHandler();
 
   $config = $config_factory->getEditable('system.mail');
   $default_interface = $config->get('interface.default');
@@ -97,7 +97,7 @@ function _dmf_mail_check_mail_plugin() {
  * Install the dmf_php_mail plugin for the dmf_mail module.
  */
 function _dmf_mail_install_plugin() {
-  $config = \Drupal::configFactory()->getEditable('system.mail');
+  $config = Drupal::configFactory()->getEditable('system.mail');
   $mail_plugins = $config->get('interface');
   if (!isset($mail_plugins['dmf_mail']) || $mail_plugins['dmf_mail'] !== 'dmf_php_mail') {
     $mail_plugins['dmf_mail'] = 'dmf_php_mail';
@@ -109,7 +109,7 @@ function _dmf_mail_install_plugin() {
  * Uninstall the dmf_php_mail plugin override.
  */
 function _dmf_mail_uninstall_plugin() {
-  $config = \Drupal::configFactory()->getEditable('system.mail');
+  $config = Drupal::configFactory()->getEditable('system.mail');
   $mail_plugins = $config->get('interface');
   if (isset($mail_plugins['dmf_mail'])) {
     unset($mail_plugins['dmf_mail']);

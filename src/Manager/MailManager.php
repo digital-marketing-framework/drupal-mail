@@ -27,7 +27,7 @@ class MailManager implements MailManagerInterface
     public function sendMessage(Email $message): void
     {
         $toAddresses = $message->getTo();
-        $to = implode(', ', array_map(fn($addr) => $addr->toString(), $toAddresses));
+        $to = implode(', ', array_map(fn ($addr) => $addr->toString(), $toAddresses));
 
         // Use default language as fallback for CLI context where current language may not be set
         $langcode = $this->languageManager->getDefaultLanguage()->getId();
@@ -39,7 +39,7 @@ class MailManager implements MailManagerInterface
         // Pass reply-to for Drupal API compatibility.
         $reply = null;
         $replyTo = $message->getReplyTo();
-        if (!empty($replyTo)) {
+        if ($replyTo !== []) {
             $reply = $replyTo[0]->toString();
         }
 

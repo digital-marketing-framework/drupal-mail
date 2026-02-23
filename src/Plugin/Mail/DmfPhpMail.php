@@ -14,28 +14,31 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * instead of converting it to plain text like the default PhpMail plugin.
  */
 #[Mail(
-  id: 'dmf_php_mail',
-  label: new TranslatableMarkup('Anyrel PHP mailer'),
-  description: new TranslatableMarkup("Sends the message as plain text or HTML, using PHP's native mail() function."),
+    id: 'dmf_php_mail',
+    label: new TranslatableMarkup('Anyrel PHP mailer'),
+    description: new TranslatableMarkup("Sends the message as plain text or HTML, using PHP's native mail() function."),
 )]
-class DmfPhpMail extends PhpMail {
+class DmfPhpMail extends PhpMail
+{
+    /**
+     * @param array<mixed> $message
+     *
+     * @return array<mixed>
+     */
+    public function format(array $message)
+    {
+        // Join the body array into one string.
+        $message['body'] = implode("\n\n", $message['body']);
 
-  /**
-   * {@inheritdoc}
-   */
-  public function format(array $message) {
-    // Join the body array into one string.
-    $message['body'] = implode("\n\n", $message['body']);
+        // If HTML flag is set, preserve HTML content.
+        $html = (string)($message['params']['html'] ?? '');
+        if ($html !== '') {
+            return $message;
+        }
 
-    // If HTML flag is set, preserve HTML content.
-    if (!empty($message['params']['html'])) {
-      return $message;
+        // For plain text emails, wrap the body for proper formatting.
+        $message['body'] = MailFormatHelper::wrapMail($message['body']);
+
+        return $message;
     }
-
-    // For plain text emails, wrap the body for proper formatting.
-    $message['body'] = MailFormatHelper::wrapMail($message['body']);
-
-    return $message;
-  }
-
 }
