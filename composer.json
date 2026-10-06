@@ -46,7 +46,10 @@
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "drupal/core-composer-scaffold": true,
             "ergebnis/composer-normalize": true,
-            "phpstan/extension-installer": true
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true,
+            "symfony/runtime": true,
+            "tbachert/spi": true
         },
         "bin-dir": ".Build/bin",
         "sort-packages": true,
