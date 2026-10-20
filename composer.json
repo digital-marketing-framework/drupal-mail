@@ -23,7 +23,7 @@
     "require": {
         "php": "^8.2",
         "digital-marketing-framework/drupal-core": "^1.0",
-        "digital-marketing-framework/mail": "^2.0",
+        "digital-marketing-framework/mail": "^2.1",
         "drupal/core": "^10.0 || ^11.0"
     },
     "require-dev": {
