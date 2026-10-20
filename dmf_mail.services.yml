@@ -7,5 +7,7 @@ services:
 
   dmf_mail.core_registry_update_event_subscriber:
     class: Drupal\dmf_mail\Registry\EventSubscriber\CoreRegistryUpdateEventSubscriber
+    arguments:
+      - '@dmf_mail.mail_manager'
     tags:
       - { name: event_subscriber }
